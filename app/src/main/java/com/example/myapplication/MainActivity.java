@@ -1,11 +1,10 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,75 +12,58 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
-        private EditText weightEditText, heightEditText;
-        private TextView resultTextView, categoryTextView;
+public class MainActivity extends AppCompatActivity{
+    private static final String TAG = "bmi";
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
+    private EditText inputWeight,inputHeight;
+    private TextView show;
 
-            // 初始化视图组件
-            weightEditText = findViewById(R.id.weight);
-            heightEditText = findViewById(R.id.height);
-            resultTextView = findViewById(R.id.result);
-            categoryTextView = findViewById(R.id.category);
-            Button calculateButton = findViewById(R.id.calculate);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        // 初始化控件
+        inputHeight = findViewById(R.id.inph);
+        inputWeight = findViewById(R.id.inpw);
+        show = findViewById(R.id.result);
 
-            // 设置按钮点击监听器
-            calculateButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    calculateBMI();
-                }
-            });
-        }
+    }
 
-        private void calculateBMI() {
-            // 获取输入值
-            String weightStr = weightEditText.getText().toString();
-            String heightStr = heightEditText.getText().toString();
+    public void click(View v){
+        Log.i(TAG, "click: 1111111111");
+        //获取用户输入数据
+        String strh = inputHeight.getText().toString();
+        String strw = inputWeight.getText().toString();
+        Log.i(TAG, "click: h=" + strh);
+        Log.i(TAG, "click: w=" + strw);
 
-            if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
-                try {
-                    // 转换输入为数值
-                    float weight = Float.parseFloat(weightStr);
-                    float height = Float.parseFloat(heightStr);
 
-                    if (height > 0) {
-                        // 计算BMI
-                        float bmi = weight / (height * height);
+        try {
+            //类型转换 String -> float/double
+            float h = Float.parseFloat(strh);
+            float w = Float.parseFloat(strw);
+            float bmi = w/(h*h);
 
-                        // 显示结果
-                        resultTextView.setText(String.format("BMI: %.2f", bmi));
-                        categoryTextView.setText(getBMICategory(bmi));
-                    } else {
-                        showError("身高必须大于0");
-                    }
-                } catch (NumberFormatException e) {
-                    showError("请输入有效数字");
-                }
-            } else {
-                showError("请填写所有字段");
+            //判断并给出结论
+            if(bmi<18){
+                show.setText(String.format("BMI=%.2f %s",bmi,"多吃点"));
+            }else if (bmi<22){
+                show.setText(String.format("BMI=%.2f %s",bmi,"要保持哟"));
+            }else if (bmi<28){
+                show.setText(String.format("BMI=%.2f %s",bmi,"不要太胖了"));
+            }else{
+                show.setText(String.format("BMI=%.2f %s",bmi,"开心就好"));
             }
-        }
-
-        private String getBMICategory(float bmi) {
-            if (bmi < 18.5) {
-                return "体重过轻";
-            } else if (bmi < 24.9) {
-                return "健康体重";
-            } else if (bmi < 29.9) {
-                return "超重";
-            } else {
-                return "肥胖";
-            }
-        }
-
-        private void showError(String message) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            resultTextView.setText("");
-            categoryTextView.setText("");
+        } catch (NumberFormatException e) {
+            show.setText("请输入完成数据后计算");
         }
     }
+    //添加了一行内容
+
+}
