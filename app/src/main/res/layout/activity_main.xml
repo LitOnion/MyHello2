@@ -36,8 +36,8 @@
         android:minHeight="48dp"/>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="341dp"
+        android:layout_height="78dp"
         android:layout_marginTop="24dp"
         android:onClick="click"
         android:text="@string/label_btn" />
